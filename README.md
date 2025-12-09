@@ -48,10 +48,8 @@ pip install -r requirements.txt
 
 ```
 ML-Captcha-Model/
-├── data_loader.py      # Dataset class and data loading utilities
-├── models.py           # Model architectures (BaselineCNN, CRNN)
-├── train.py            # Training script
-├── evaluate.py         # Evaluation utilities
+├── captcha_solver.py   # PyTorch implementation (all-in-one)
+├── captcha_keras.py    # TensorFlow/Keras implementation (lecture-style)
 ├── requirements.txt    # Python dependencies
 ├── samples/            # CAPTCHA images (place dataset here)
 ├── checkpoints/        # Saved model checkpoints (created during training)
@@ -60,21 +58,35 @@ ML-Captcha-Model/
 
 ## Usage
 
-### Training the Baseline Model
+### 🔥 PyTorch Version (captcha_solver.py)
 
-Train the baseline CNN model:
+Everything in one file with PyTorch/torchvision.
+
+#### Training the Baseline Model
+
 ```bash
-python train.py --model_type baseline --epochs 50 --batch_size 32 --augment
+python captcha_solver.py train --model_type baseline --epochs 50 --batch_size 32 --augment
 ```
 
-### Training the CRNN Model (Stretch Goal)
+#### Training the CRNN Model
 
-Train the CRNN model:
 ```bash
-python train.py --model_type crnn --epochs 50 --batch_size 32 --augment
+python captcha_solver.py train --model_type crnn --epochs 50 --batch_size 32 --augment
 ```
 
-### Training Options
+#### Evaluation
+
+```bash
+python captcha_solver.py evaluate --checkpoint checkpoints/best_baseline.pth
+```
+
+#### Predict a Single Image
+
+```bash
+python captcha_solver.py predict --checkpoint checkpoints/best_baseline.pth --image_path samples/abc12.png
+```
+
+#### Training Options
 
 - `--data_dir`: Directory containing CAPTCHA images (default: `samples`)
 - `--model_type`: Model architecture - `baseline` or `crnn` (default: `baseline`)
@@ -85,12 +97,27 @@ python train.py --model_type crnn --epochs 50 --batch_size 32 --augment
 - `--save_dir`: Directory to save checkpoints (default: `checkpoints`)
 - `--log_dir`: Directory for TensorBoard logs (default: `logs`)
 
-### Evaluation
+### 🎓 TensorFlow/Keras Version (captcha_keras.py)
 
-Evaluate a trained model:
+Follows CST463 lecture patterns: batch processing, data augmentation, transfer learning.
+
+#### Training Baseline Model
+
 ```bash
-python evaluate.py --checkpoint checkpoints/best_baseline.pth --model_type baseline
+python captcha_keras.py --model baseline
 ```
+
+#### Training Improved Model (Data Augmentation + VGG16 Transfer Learning)
+
+```bash
+python captcha_keras.py --model improved
+```
+
+This version includes:
+- **Batch Processing**: Uses `tf.data.Dataset` with prefetching
+- **Data Augmentation**: RandomFlip, RandomRotation, RandomZoom
+- **Transfer Learning**: VGG16 pretrained on ImageNet
+- **Fine-tuning**: Unfreezes top conv blocks for better performance
 
 ### Monitoring Training
 
